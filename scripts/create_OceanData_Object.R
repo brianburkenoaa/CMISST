@@ -13,17 +13,6 @@
 
 library(ncdf4)
 
-# For testing the function - delete when finished
-returnDataType='anom'
-returnObjectType='array'
-lon.subset=seq(158, 246, 2)
-lat.subset=seq(10, 62, 2)
-years=seq(1980, 2020, 1)
-months=seq(1,12,1)
-year_mo<-data.frame(year=rep(years, each=12), month=rep(months, length(years)),
-                    label=paste(rep(years, each=12), rep(months, length(years)), sep = "_"))
-removeBering=TRUE
-
 #***************************************************************
 # Create the function
 #***************************************************************
