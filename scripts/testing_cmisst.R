@@ -51,6 +51,7 @@ returnObjectType='array'
 
 
 #  NOT IMPLEMENTED IN THE REST OF THE CODE
+# THIS WAS TO CREATE THE GLOBAL SST DATA (RDATA FILE) FOR SHINY
 # Code to extract the full globe data and save it to a file
 # dataSet='ERSST'
 # # Full globe

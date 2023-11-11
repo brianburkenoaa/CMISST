@@ -22,6 +22,10 @@ get_CMISST_index <- function(response, dataSet='ERSST',
   # Extract and scale the SST data
   #***************************************************************
   
+  #  The original script loaded individual .nc files as needed
+  #  The revised version, for shiny, loads a saved version of the 
+  #    full globe and subsets it.
+  #  The original code is commented out here.
   # source("create_OceanData_Object.R")
   # oceanData<-getOceanData(dataSet=dataSet,
   #                        returnDataType=returnDataType, returnObjectType=returnObjectType,
@@ -29,14 +33,14 @@ get_CMISST_index <- function(response, dataSet='ERSST',
   #                        min.lat=min.lat, max.lat=max.lat,
   #                        years = years, months = months,
   #                        removeBering = removeBering)
-  load('data/oceanSSTData.RData')
-
+  
+  load('data/oceanSSTData.RData') # this will need an if statement - if(dataSet=="ERSST"))
   # Index the locations in the file
   lons <- as.numeric(dimnames(oceanData)[[1]])
   lats <- as.numeric(dimnames(oceanData)[[2]])
   yr_mo <- dimnames(oceanData)[[3]]
-  lon.index<-which(lons > min.lon & lons < max.lon) 
-    lat.index<-which(lats > min.lat & lats < max.lat)
+  lon.index<-which(lons >= min.lon & lons <= max.lon) 
+    lat.index<-which(lats >= min.lat & lats <= max.lat)
   yr_mo.index<-which(yr_mo %in% year_mo$label)
   oceanData <- oceanData[lon.index, lat.index, yr_mo.index]
 
