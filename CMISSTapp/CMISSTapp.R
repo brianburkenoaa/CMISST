@@ -19,11 +19,11 @@ land2 <- rbind(pacified_amer, rest_of_world)
 
 # set parameters
 dataSet='ERSST'
-min.lon = 158
-max.lon = 246
-min.lat = 10
-max.lat = 62
-years = seq(1981, 2020, 1)
+# min.lon = 158
+# max.lon = 246
+# min.lat = 10
+# max.lat = 62
+# years = seq(1981, 2020, 1)
 months=seq(1,12,1)
 removeBering=TRUE
 returnDataType='anom'
