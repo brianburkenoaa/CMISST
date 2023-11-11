@@ -29,8 +29,8 @@ getOceanData<-function(dataSet='ERSST',
   if (min.lon < 0 | min.lon > 360 | max.lon < 0 | max.lon > 360) return (cat("Longitude is in degrees east (Tokyo is 139.8, Seattle is 237.6)"))
   if (min.lat < -90 | min.lat > 90 | max.lat < -90 | max.lat > 90) return (cat("Latitude is in degrees from the equator (should not exceed 90)"))
 
-  year_mo<-data.frame(year=rep(years, each=12), month=rep(months, length(years)),
-                      label=paste(rep(years, each=12), rep(months, length(years)), sep = "_"))
+  year_mo<-data.frame(year=rep(years, each=length(months)), month=rep(months, length(years)),
+                      label=paste(rep(years, each=length(months)), rep(months, length(years)), sep = "_"))
   
   #***************************************************************
   # Extract the location data

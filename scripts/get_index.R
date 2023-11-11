@@ -4,19 +4,19 @@
 source("scripts/create_OceanData_Object.R")
 
 get_CMISST_index <- function(response, dataSet='ERSST',
-                          lon.subset=seq(158, 246, 2),
-                          lat.subset=seq(10, 62, 2),
-                          returnDataType='anom',
-                          returnObjectType='array',
-                          removeBering=TRUE) {
+                             years=NA, months=1:12,
+                             min.lon=158, max.lon=246,
+                             min.lat=10, max.lat=62,
+                             returnDataType='anom',
+                             returnObjectType='array',
+                             removeBering=TRUE) {
   # Verify that the response is what we expect
   if (ncol(response)!=2) { print("incorrect data - requires a 2-column data frame with year and the response"); return(NA) }
   colnames(response)<-c("year","val")
   
-  years=response$year
-  months=1:12
-  year_mo<-data.frame(year=rep(years, each=12), month=rep(months, length(years)),
-                      label=paste(rep(years, each=12), rep(months, length(years)), sep = "_"))
+  if (is.na(years)[1]) years=response$year
+  year_mo<-data.frame(year=rep(years, each=length(months)), month=rep(months, length(years)),
+                      label=paste(rep(years, each=length(months)), rep(months, length(years)), sep = "_"))
   
   #***************************************************************
   # Extract and scale the SST data
@@ -25,8 +25,8 @@ get_CMISST_index <- function(response, dataSet='ERSST',
   source("scripts/create_OceanData_Object.R")
   oceanData<-getOceanData(dataSet=dataSet,
                          returnDataType=returnDataType, returnObjectType=returnObjectType,
-                         min.lon=158, max.lon=246,
-                         min.lat=10, max.lat=62,
+                         min.lon=min.lon, max.lon=max.lon,
+                         min.lat=min.lat, max.lat=max.lat,
                          years = years, months = months,
                          removeBering = removeBering)
  
