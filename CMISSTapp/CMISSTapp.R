@@ -4,12 +4,13 @@ library(reshape2)
 library(sf)
 library(ggplot2)
 library(RColorBrewer)
+library(rnaturalearth)
 
 source('get_index.R')
 source('run_fetch_FPC_counts_single_species.R')
 
 # get the land for plotting (wrap across antimeridian)
-land<-rnaturalearth::ne_countries(type='countries', scale = "large", returnclass = "sf")
+land<-ne_countries(type='countries', scale = "large", returnclass = "sf")
 amer <- land[land$region_un=='Americas',]
 # shift the Americas to a more Pacific centric worldview
 pacified_amer <- st_shift_longitude(amer)
@@ -49,15 +50,15 @@ ui <- fluidPage(
                  # Input: Slider for the Latitude range ----
                  sliderInput(inputId = "lat",
                              label = "Latitude Range:",
-                             min = -90,
-                             max = 90,
+                             min = -88,
+                             max = 88,
                              value = c(10, 62)),
                  
                  # Input: Slider for the Latitude range ----
                  sliderInput(inputId = "long",
                              label = "Longitude Range (0 and 360 are the Prime Meridian):",
-                             min = 2,
-                             max = 360,
+                             min = 0,
+                             max = 358,
                              step = 2,
                              value = c(158, 246)),
                  

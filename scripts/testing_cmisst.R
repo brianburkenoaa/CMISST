@@ -4,6 +4,7 @@ library(reshape2)
 library(sf)
 library(ggplot2)
 library(RColorBrewer)
+library(ncdf4)
 
 source('scripts/get_index.R')
 source('scripts/dam_counts/run_fetch_FPC_counts_single_species.R')
@@ -29,10 +30,10 @@ returnDataType='anom'
 returnObjectType='array'
 
 # Full globe
-# min.lon=1
-# max.lon=360
-# min.lat=-90
-# max.lat=90
+min.lon=2
+max.lon=358
+min.lat=-88
+max.lat=88
 
 # Regional
 # min.lon=220
@@ -40,16 +41,36 @@ returnObjectType='array'
 # min.lat=30
 # max.lat=55
 
+# Get the lat and long of the 
+ncfname <- "data/../../data/SST/ersst.v5.202001.nc"
+ncin <- nc_open(ncfname)
+lons <- ncvar_get(ncin,"lon")
+lats <- ncvar_get(ncin,"lat",verbose=F)
+nc_close(ncin)
+
+
 #  NOT IMPLEMENTED IN THE REST OF THE CODE
 # Code to extract the full globe data and save it to a file
-# oceanData<-getOceanData(dataSet=dataSet,
-#                         returnDataType=returnDataType, returnObjectType=returnObjectType,
-#                         min.lon=min.lon, max.lon=max.lon,
-#                         min.lat=min.lat, max.lat=max.lat,
-#                         years = years, months = months,
-#                         removeBering = removeBering)
-# save(x = "oceanData", file = 'data/oceanSSTData.RData')
-# load('data/oceanSSTData.RData')
+dataSet='ERSST'
+# Full globe
+min.lon=0
+max.lon=360
+min.lat=-90
+max.lat=90
+years=seq(1950, 2022, 1)
+months=seq(1,12,1)
+removeBering=FALSE
+returnDataType='anom'
+returnObjectType='array'
+
+oceanData<-getOceanData(dataSet=dataSet,
+                        returnDataType=returnDataType, returnObjectType=returnObjectType,
+                        min.lon=min.lon, max.lon=max.lon,
+                        min.lat=min.lat, max.lat=max.lat,
+                        years = years, months = months,
+                        removeBering = removeBering)
+save(x = "oceanData", file = 'data/oceanSSTData.RData')
+load('data/oceanSSTData.RData')
 
 
 #  Code to extract dam counts and save to a file

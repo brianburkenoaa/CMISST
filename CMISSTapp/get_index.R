@@ -29,6 +29,8 @@ get_CMISST_index <- function(response, dataSet='ERSST',
                          min.lat=min.lat, max.lat=max.lat,
                          years = years, months = months,
                          removeBering = removeBering)
+  # load('data/oceanSSTData.RData')
+  # oceanData[seq(min.lon,max.lon, 2), seq(min.lat, max.lat, 2),year_mo$label]
  
   createSeasonalData<-function(oceanData,
                                years = years, months = months, year_mo=year_mo, season=1) {
