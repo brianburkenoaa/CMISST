@@ -4,18 +4,20 @@ library(reshape2)
 library(sf)
 library(ggplot2)
 library(RColorBrewer)
-library(rnaturalearth)
+#library(rnaturalearth)
 
 source('get_index.R')
-source('run_fetch_FPC_counts_single_species.R')
+#source('run_fetch_FPC_counts_single_species.R')
 
 # get the land for plotting (wrap across antimeridian)
-land<-ne_countries(type='countries', scale = "large", returnclass = "sf")
-amer <- land[land$region_un=='Americas',]
-# shift the Americas to a more Pacific centric worldview
-pacified_amer <- st_shift_longitude(amer)
-rest_of_world <- land[!land$region_un=='Americas',]
-land2 <- rbind(pacified_amer, rest_of_world)
+# land<-ne_countries(type='countries', scale = "large", returnclass = "sf")
+# amer <- land[land$region_un=='Americas',]
+# # shift the Americas to a more Pacific centric worldview
+# pacified_amer <- st_shift_longitude(amer)
+# rest_of_world <- land[!land$region_un=='Americas',]
+# land2 <- rbind(pacified_amer, rest_of_world)
+
+load("data/land.Rdata")
 
 # set parameters
 dataSet='ERSST'

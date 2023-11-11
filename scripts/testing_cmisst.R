@@ -16,6 +16,7 @@ amer <- land[land$region_un=='Americas',]
 pacified_amer <- st_shift_longitude(amer)
 rest_of_world <- land[!land$region_un=='Americas',]
 land2 <- rbind(pacified_amer, rest_of_world)
+save("land2", file = "CMISSTapp/data/land.Rdata")
 
 # set parameters
 dataSet='ERSST'
