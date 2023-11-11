@@ -22,16 +22,26 @@ get_CMISST_index <- function(response, dataSet='ERSST',
   # Extract and scale the SST data
   #***************************************************************
   
-  source("create_OceanData_Object.R")
-  oceanData<-getOceanData(dataSet=dataSet,
-                         returnDataType=returnDataType, returnObjectType=returnObjectType,
-                         min.lon=min.lon, max.lon=max.lon,
-                         min.lat=min.lat, max.lat=max.lat,
-                         years = years, months = months,
-                         removeBering = removeBering)
-  # load('data/oceanSSTData.RData')
-  # oceanData[seq(min.lon,max.lon, 2), seq(min.lat, max.lat, 2),year_mo$label]
- 
+  # source("create_OceanData_Object.R")
+  # oceanData<-getOceanData(dataSet=dataSet,
+  #                        returnDataType=returnDataType, returnObjectType=returnObjectType,
+  #                        min.lon=min.lon, max.lon=max.lon,
+  #                        min.lat=min.lat, max.lat=max.lat,
+  #                        years = years, months = months,
+  #                        removeBering = removeBering)
+  load('data/oceanSSTData.RData')
+
+  # Index the locations in the file
+  lons <- as.numeric(dimnames(oceanData)[[1]])
+  lats <- as.numeric(dimnames(oceanData)[[2]])
+  yr_mo <- dimnames(oceanData)[[3]]
+  lon.index<-which(lons > min.lon & lons < max.lon) 
+    lat.index<-which(lats > min.lat & lats < max.lat)
+  yr_mo.index<-which(yr_mo %in% year_mo$label)
+  oceanData <- oceanData[lon.index, lat.index, yr_mo.index]
+
+  
+  
   createSeasonalData<-function(oceanData,
                                years = years, months = months, year_mo=year_mo, season=1) {
     seasonal<-array(NA, c(dim(oceanData)[1], dim(oceanData)[2], length(years)), dimnames = list(dimnames(oceanData)[[1]], dimnames(oceanData)[[2]], years))
