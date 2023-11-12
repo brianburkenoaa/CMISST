@@ -24,59 +24,66 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(h1("Controls"),
                  
-                 hr(style = "border-top: 1px solid #000000;"),
-                 #HTML('<hr style="color: purple;">'),
-                 
-                 # Input: log response? ----
-                 checkboxInput(inputId = "log",
-                             label = "Log response?",
-                             value = TRUE),
+                 fluidRow(
+                   hr(style = "border-top: 1px solid #000000;"),
 
-                 hr(style = "border-top: 1px solid #000000;"),
-                 # Input: Slider for the Latitude range ----
-                 sliderInput(inputId = "lat",
-                             label = "Latitude Range:",
-                             min = -88,
-                             max = 88,
-                             value = c(10, 62)),
-                 
-                 # Input: Slider for the Latitude range ----
-                 sliderInput(inputId = "long",
-                             label = "Longitude Range (0 and 360 are the Prime Meridian):",
-                             min = 0,
-                             max = 358,
-                             step = 2,
-                             value = c(158, 246)),
-                 
-                 hr(style = "border-top: 1px solid #000000;"),
-                 # Input: Slider for Years ----
-                 sliderInput(inputId = "years",
-                             label = "Years:",
-                             min = 1960,
-                             max = 2020,
-                             sep="",
-                             value = c(1981, 2020)),
-                 
-                 hr(style = "border-top: 1px solid #000000;"),
-                 # Input: What map to plot
-                 radioButtons("season", "Which season to plot:",
-                              c("Winter" = "win",
-                                "Spring" = "spr",
-                                "Summer" = "sum",
-                                "Autumn" = "aut"),
-                              selected = "spr"),
-                 
-                 hr(style = "border-top: 1px solid #000000;"),
-                 # Input: Reset button ----
-                 actionButton(inputId = "reset",
-                              label = "Reset all"),
-                 
-                 hr(style = "border-top: 1px solid #000000;"),
-                 # Download the results to a file
-                 downloadButton('download',"Download the Results")
-
+                   selectInput(inputId = "stock",
+                               label = "Select Response",
+                               choices = c("Spring Chinook" = "spCK",
+                                           "Fall Chinook" = "faCK",
+                                           "Steelhead" = "steel"),
+                               selected = "sprCh"),
+                   
+                   # Input: log response? ----
+                   checkboxInput(inputId = "log",
+                                 label = "Log response?",
+                                 value = TRUE),
+                   
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Input: Slider for the Latitude range ----
+                   sliderInput(inputId = "lat",
+                               label = "Latitude Range:",
+                               min = -88,
+                               max = 88,
+                               value = c(10, 62)),
+                   
+                   # Input: Slider for the Latitude range ----
+                   sliderInput(inputId = "long",
+                               label = "Longitude Range (0 and 360 are the Prime Meridian):",
+                               min = 0,
+                               max = 358,
+                               step = 2,
+                               value = c(158, 246)),
+                   
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Input: Slider for Years ----
+                   sliderInput(inputId = "years",
+                               label = "Years:",
+                               min = 1960,
+                               max = 2020,
+                               sep="",
+                               value = c(1981, 2020)),
+                   
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Input: What map to plot
+                   radioButtons("season", "Which season to plot:",
+                                c("Winter" = "win",
+                                  "Spring" = "spr",
+                                  "Summer" = "sum",
+                                  "Autumn" = "aut"),
+                                selected = "spr"),
+                   
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Input: Reset button ----
+                   actionButton(inputId = "reset",
+                                label = "Reset all"),
+                   
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Download the results to a file
+                   downloadButton('download',"Download the Results")
+                 )
     ),
-    mainPanel(h3("Covariance Map of Sea surface Temperature"),
+    mainPanel(h3("Covariance Map of Sea Surface Temperature"),
               h5("(or other spatial data)"),
               
               # Output: Covariance Map ----
@@ -106,7 +113,8 @@ server <- function(input, output, session) {
     max.lat = input$lat[2]
     years = seq(input$years[1], input$years[2], 1)
     
-    response.tmp <- response[response$year %in% years, ]
+    response.tmp <- response[response$year %in% years, c('year', input$stock)]
+    colnames(response.tmp) <- c('year','val')
     if(input$log) response.tmp$val <- log(response.tmp$val)
     response.tmp$val.scl <- scale(response.tmp$val)
 
@@ -124,6 +132,7 @@ server <- function(input, output, session) {
     updateSliderInput(session,'lat',value = c(10, 62))
     updateSliderInput(session,'long',value = c(158, 246))
     updateSliderInput(session,'years',value = c(1981, 2020))
+    updateRadioButtons(session = session, inputId = 'season', selected = 'spr')
   })
 
   # Covariance Map
