@@ -9,15 +9,6 @@ library(ncdf4)
 source('scripts/get_index.R')
 source('scripts/dam_counts/run_fetch_FPC_counts_single_species.R')
 
-# get the land for plotting (wrap across antimeridian)
-land<-rnaturalearth::ne_countries(type='countries', scale = "large", returnclass = "sf")
-amer <- land[land$region_un=='Americas',]
-# shift the Americas to a more Pacific centric worldview
-pacified_amer <- st_shift_longitude(amer)
-rest_of_world <- land[!land$region_un=='Americas',]
-land2 <- rbind(pacified_amer, rest_of_world)
-save("land2", file = "CMISSTapp/data/land.Rdata")
-
 # set parameters
 dataSet='ERSST'
 min.lon=158
@@ -86,11 +77,13 @@ returnObjectType='array'
 # save(x = "response", file = 'data/responseData.RData')
 
 load('data/responseData.RData')
+load('CMISSTapp/data/land.Rdata')
 response <- response[response$year %in% years, ]
 # Scale (and log?)
-response$val.scl <- scale(response$val)
+response$val <-log(response$spCK)
+response$val <- scale(response$val)
 
-cmisst <- get_CMISST_index(response = response[,c("year","val.scl")], dataSet = dataSet,
+cmisst <- get_CMISST_index(response = response[,c("year","val")], oceanData = oceanData_ERSST,
                            min.lon = min.lon, max.lon = max.lon,
                            min.lat = min.lat, max.lat = max.lat,
                            years = years, months = months,
@@ -116,10 +109,35 @@ limits<-c(-lmt, lmt)
 ggplot() +
   geom_raster(data = melt(covMap),
               aes(x = Var1, y = Var2, fill=value)) +
-  geom_sf(data=land2, color="black", fill="grey", linewidth=0.25) +
+  geom_sf(data=land, color="black", fill="grey", linewidth=0.25) +
   xlim(min.lon, max.lon) + ylim(min.lat, max.lat) +
   scale_fill_gradientn(colours = myPalette(100),limits=limits,name="Covariance", na.value = "white") +
   #scale_fill_gradientn(colours = myPalette(100), name="Covariance", na.value = "white") +
   theme_classic() + theme(panel.border = element_rect(colour = "grey", fill=NA)) +
   labs(x = "Longitude", y = "Latitude")
+
+
+# LOO CV
+source('CMISSTapp/crossValidation.R')
+
+# This first part would be done in the shiny app
+year_mo<-data.frame(year=rep(years, each=length(months)), month=rep(months, length(years)),
+                    label=paste(rep(years, each=length(months)), rep(months, length(years)), sep = "_"))
+load('CMISSTapp/data/oceanSSTData.RData')
+oceanData<-oceanData_ERSST
+lons <- as.numeric(dimnames(oceanData)[[1]])
+lats <- as.numeric(dimnames(oceanData)[[2]])
+yr_mo <- dimnames(oceanData)[[3]]
+lon.index<-which(lons >= min.lon & lons <= max.lon) 
+lat.index<-which(lats >= min.lat & lats <= max.lat)
+yr_mo.index<-which(yr_mo %in% year_mo$label)
+oceanData <- oceanData[lon.index, lat.index, yr_mo.index]
+
+
+start_time <- Sys.time()
+loocv <- LOO_CV(response = response[,c("year","val")],
+                oceanData = oceanData,
+                years = years, months = months)
+end_time <- Sys.time()
+end_time - start_time
 

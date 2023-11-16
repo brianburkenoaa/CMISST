@@ -1,9 +1,9 @@
 # This will create the CMISST index, given a response variable time series
 #  and a user-specified spatial ocean variable
 
-source("create_OceanData_Object.R")
+#source("create_OceanData_Object.R")
 
-get_CMISST_index <- function(response, dataSet='ERSST',
+get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
                              years=NA, months=1:12,
                              min.lon=158, max.lon=246,
                              min.lat=10, max.lat=62,
@@ -19,22 +19,17 @@ get_CMISST_index <- function(response, dataSet='ERSST',
                       label=paste(rep(years, each=length(months)), rep(months, length(years)), sep = "_"))
   
   #***************************************************************
-  # Extract and scale the SST data
+  # Extract and scale the spatial data
   #***************************************************************
   
   #  The original script loaded individual .nc files as needed
   #  The revised version, for shiny, loads a saved version of the 
   #    full globe and subsets it.
-  #  The original code is commented out here.
-  # source("create_OceanData_Object.R")
-  # oceanData<-getOceanData(dataSet=dataSet,
-  #                        returnDataType=returnDataType, returnObjectType=returnObjectType,
-  #                        min.lon=min.lon, max.lon=max.lon,
-  #                        min.lat=min.lat, max.lat=max.lat,
-  #                        years = years, months = months,
-  #                        removeBering = removeBering)
-  
-  load('data/oceanSSTData.RData') # this will need an if statement - if(dataSet=="ERSST"))
+  #  Data that needs to be loaded is in createStoredObjects.R
+
+  # if (dataSet == "ERSST") oceanData <- oceanData_ERSST
+  # if (dataSet == "SSH") oceanData <- oceanData_SSH
+
   # Index the locations in the file
   lons <- as.numeric(dimnames(oceanData)[[1]])
   lats <- as.numeric(dimnames(oceanData)[[2]])
@@ -83,13 +78,13 @@ get_CMISST_index <- function(response, dataSet='ERSST',
   options(na.action="na.omit")
   for (tt in 1:dim(oceanData.s1.scl)[3])
     coefs_cov<-rbind(coefs_cov, c(lm(as.vector(oceanData.s1.scl[,,tt]) ~ -1 + as.vector(covs1))$coef,
-                                  lm(as.vector(oceanData.s1.scl[,,tt]) ~ -1 + as.vector(covs2))$coef,
-                                  lm(as.vector(oceanData.s1.scl[,,tt]) ~ -1 + as.vector(covs3))$coef,
-                                  lm(as.vector(oceanData.s1.scl[,,tt]) ~ -1 + as.vector(covs4))$coef))
+                                  lm(as.vector(oceanData.s2.scl[,,tt]) ~ -1 + as.vector(covs2))$coef,
+                                  lm(as.vector(oceanData.s3.scl[,,tt]) ~ -1 + as.vector(covs3))$coef,
+                                  lm(as.vector(oceanData.s4.scl[,,tt]) ~ -1 + as.vector(covs4))$coef))
   coefs_cov<-data.frame(coefs_cov)
   coefs_cov$year<-years
   index_cov<-cbind(coefs_cov,response$val)
   colnames(index_cov)<-c("win.cov","spr.cov","sum.cov","aut.cov","year","val")
 
-  return(list(index_cov, covs1, covs2, covs3, covs4, min.lat, max.lat, min.lon, max.lon))
+  return(list(index_cov, covs1, covs2, covs3, covs4, c(min.lat, max.lat, min.lon, max.lon)))
 }
