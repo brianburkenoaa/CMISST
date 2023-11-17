@@ -83,7 +83,7 @@ response <- merge(merge(spCK, faCK), steel)
 
 # lag response (this is now done in the app)
 #response$year <- response$year - 2
-response <- response[response$year %in% c(1981:2022), ]
+response <- response[response$year %in% c(1981:2023), ]
 save(x = "response", file = 'CMISSTapp/data/responseData.RData')
 load(file = 'CMISSTapp/data/responseData.RData')
 
@@ -93,7 +93,7 @@ spCK$val <- spCK$MCN[[1]]
 response <- spCK[,c("Year","val")]
 colnames(response) <- c("year","val")
 # lag response
-response$year <- response$year - 2
-response <- response[response$year %in% c(1981:2020), ]
+#response$year <- response$year - 2
+response <- response[response$year %in% c(1981:2023), ]
 write.csv(x = response, file = 'CMISSTapp/data/user_response.csv', row.names = FALSE)
 

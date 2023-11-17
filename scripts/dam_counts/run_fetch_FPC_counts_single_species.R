@@ -25,7 +25,7 @@ fetch_FPC_counts_single_species<-function(my_species="spCK", my_age="adult") {
   steel_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364, LGR=1:364)
   sock_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364, LGR=1:364)
   Year_start<-1981
-  Year_end<-2022 
+  Year_end<-2023
   
   if (my_species=="spCK" & my_age=="adult") {
     # Filter object dam_counts by parameters defined above ####

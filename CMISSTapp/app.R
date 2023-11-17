@@ -98,9 +98,9 @@ ui <- fluidPage(
                    sliderInput(inputId = "years",
                                label = "Years:",
                                min = 1970,
-                               max = 2022,
+                               max = 2023,
                                sep="",
-                               value = c(1981, 2020)),
+                               value = c(1981, 2023)),
                    
                    hr(style = "border-top: 1px solid #000000;"),
                    # Input: MAE LOO CV? ----
@@ -205,7 +205,7 @@ server <- function(input, output, session) {
   observeEvent(input$reset,{
     updateSliderInput(session,'lat',value = c(10, 62))
     updateSliderInput(session,'long',value = c(158, 246))
-    updateSliderInput(session,'years',value = c(1981, 2020))
+    updateSliderInput(session,'years',value = c(1981, 2023))
     updateRadioButtons(session = session, inputId = 'season', selected = 'spr')
     #reset('datafile') # this would require the shinyjs package
   })
