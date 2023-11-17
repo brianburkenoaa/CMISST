@@ -45,7 +45,7 @@ input.lat = c(10, 62)
 # Input: Slider for the Latitude range ----
 input.long= c(158, 246)
 # Input: Slider for Years ----
-input.years= c(1981, 2020)
+input.years= c(1970, 2023)
 # Input: MAE LOO CV? ----
 input.loocv= FALSE
 # Input: What map to plot

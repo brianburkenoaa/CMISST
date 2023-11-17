@@ -68,6 +68,15 @@ ui <- fluidPage(
                                  label = "Log response?",
                                  value = TRUE),
 
+                   hr(style = "border-top: 1px solid #000000;"),
+                   # Input: Slider for Years ----
+                   sliderInput(inputId = "years",
+                               label = "Years:",
+                               min = 1970,
+                               max = 2023,
+                               sep="",
+                               value = c(1981, 2023)),
+                   
                    # Input: lag response? ----
                    selectInput(inputId = "lag",
                                label = "Lag Response:",
@@ -92,15 +101,6 @@ ui <- fluidPage(
                                max = 358,
                                step = 2,
                                value = c(158, 246)),
-                   
-                   hr(style = "border-top: 1px solid #000000;"),
-                   # Input: Slider for Years ----
-                   sliderInput(inputId = "years",
-                               label = "Years:",
-                               min = 1970,
-                               max = 2023,
-                               sep="",
-                               value = c(1981, 2023)),
                    
                    hr(style = "border-top: 1px solid #000000;"),
                    # Input: MAE LOO CV? ----

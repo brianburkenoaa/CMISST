@@ -67,15 +67,15 @@ load('CMISSTapp/data/oceanSSHData.RData')
 
 
 #  Code to extract dam counts and save to a file
-spCK <- fetch_FPC_counts_single_species(my_species="spCK", my_age="adult")
+spCK <- fetch_FPC_counts_single_species(my_species="spCK", my_age="adult", Year_start = 1970, Year_end = 2023)
 spCK$val <- spCK$BON[[1]]
 spCK <- spCK[,c("Year","val")]
 colnames(spCK) <- c("year","spCK")
-faCK <- fetch_FPC_counts_single_species(my_species="faCK", my_age="adult")
+faCK <- fetch_FPC_counts_single_species(my_species="faCK", my_age="adult", Year_start = 1970, Year_end = 2023)
 faCK$val <- faCK$BON[[1]]
 faCK <- faCK[,c("Year","val")]
 colnames(faCK) <- c("year","faCK")
-steel <- fetch_FPC_counts_single_species(my_species="steel", my_age="adult")
+steel <- fetch_FPC_counts_single_species(my_species="steel", my_age="adult", Year_start = 1970, Year_end = 2023)
 steel$val <- steel$BON[[1]]
 steel <- steel[,c("Year","val")]
 colnames(steel) <- c("year","steel")
@@ -83,7 +83,7 @@ response <- merge(merge(spCK, faCK), steel)
 
 # lag response (this is now done in the app)
 #response$year <- response$year - 2
-response <- response[response$year %in% c(1981:2023), ]
+response <- response[response$year %in% c(1970:2023), ]
 save(x = "response", file = 'CMISSTapp/data/responseData.RData')
 load(file = 'CMISSTapp/data/responseData.RData')
 

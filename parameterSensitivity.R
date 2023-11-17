@@ -70,6 +70,7 @@ for (startLat in startLats) {
   maeResults <- rbind(maeResults, data.frame(stock= input.stock, lat=rep(startLat,4), season=mae$season,
                                              MAE=mae$mae.mean, SE=mae$mae.se, stringsAsFactors = FALSE))
 }
+input.lat <- input.lat.orig # reset
 
 ggplot() + ggtitle(input.stock) +
   geom_ribbon(data=maeResults, aes(x=lat, ymin=MAE-SE, ymax=MAE+SE, fill=season), alpha=0.1) +
@@ -77,7 +78,6 @@ ggplot() + ggtitle(input.stock) +
   ylab("Mean Absolute Error for the last 5 years") + xlab("Start Latitude") +
   theme_classic()
 
-input.lat <- input.lat.orig # reset
 
 
 

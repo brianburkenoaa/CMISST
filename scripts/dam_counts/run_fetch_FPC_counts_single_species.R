@@ -3,7 +3,8 @@
 
 # Converted to a function so we can call specific species; Brian Burke, NOAA Fisheries
 
-fetch_FPC_counts_single_species<-function(my_species="spCK", my_age="adult") {
+fetch_FPC_counts_single_species<-function(my_species="spCK", my_age="adult",
+                                          Year_start=1981, Year_end=2023) {
   
   if (!my_species %in% c("spCK","faCK","steel","sock")) {
     return(cat("Please call this function with one of the following: \"spCK\",\"faCK\",\"steel\",\"sock\""))
@@ -19,13 +20,11 @@ fetch_FPC_counts_single_species<-function(my_species="spCK", my_age="adult") {
   dam_counts<-fetch_FPC_counts()
   
   # Set up data selection for dams and spring julian day ranges at dams and define years to filter by ####
-  dam_names<-c("BON", "MCN", "IHR", "LMN", "LGR")
-  spring_julian_days<-list(BON=74:151, MCN=121:159, IHR=121:162, LMN=121:164, LGR=121:166)
-  fall_julian_days<-list(BON=213:319, MCN=221:304, IHR=224:349, LMN=226:304, LGR=230:349)
-  steel_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364, LGR=1:364)
-  sock_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364, LGR=1:364)
-  Year_start<-1981
-  Year_end<-2023
+  dam_names<-c("BON", "MCN", "IHR", "LMN")#, "LGR")
+  spring_julian_days<-list(BON=74:151, MCN=121:159, IHR=121:162, LMN=121:164)#, LGR=121:166)
+  fall_julian_days<-list(BON=213:319, MCN=221:304, IHR=224:349, LMN=226:304)#, LGR=230:349)
+  steel_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364)#, LGR=1:364)
+  sock_julian_days<-list(BON=1:364, MCN=1:364, IHR=1:364, LMN=1:364)#, LGR=1:364)
   
   if (my_species=="spCK" & my_age=="adult") {
     # Filter object dam_counts by parameters defined above ####
