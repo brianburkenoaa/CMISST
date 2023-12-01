@@ -97,3 +97,86 @@ colnames(response) <- c("year","val")
 response <- response[response$year %in% c(1981:2023), ]
 write.csv(x = response, file = 'CMISSTapp/data/user_response.csv', row.names = FALSE)
 
+
+
+#*******************************
+#*  PDO, NPGO, and ONI
+#*******************************
+
+pdo<-read.csv("https://oceanview.pfeg.noaa.gov/erddap/tabledap/cciea_OC_PDO.csv?time,PDO", header = TRUE, stringsAsFactors = FALSE)
+pdo<-pdo[-1,]
+pdo$PDO<-as.numeric(pdo$PDO)
+pdo$year<-as.numeric(substr(pdo$time,1,4))
+pdo$month <- as.numeric(substr(pdo$time,6,7))
+pdo<-pdo[,c(3,4,2)]
+colnames(pdo)[3]<-"index"
+
+# Make the seasonal indices
+pdo.win<-pdo
+pdo.win<-pdo.win[pdo.win$month %in% 1:3,]
+pdo.win<-aggregate(pdo.win$index, by=list(pdo.win$year), mean, na.rm=TRUE)
+colnames(pdo.win)<-c("year","pdo.win")
+pdo.spr<-pdo[pdo$month %in% 4:6,]
+pdo.spr<-aggregate(pdo.spr$index, by=list(pdo.spr$year), mean, na.rm=TRUE)
+colnames(pdo.spr)<-c("year","pdo.spr")
+pdo.sum<-pdo[pdo$month %in% 7:9,]
+pdo.sum<-aggregate(pdo.sum$index, by=list(pdo.sum$year), mean, na.rm=TRUE)
+colnames(pdo.sum)<-c("year","pdo.sum")
+pdo.aut<-pdo[pdo$month %in% 10:12,]
+pdo.aut<-aggregate(pdo.aut$index, by=list(pdo.aut$year), mean, na.rm=TRUE)
+colnames(pdo.aut)<-c("year","pdo.aut")
+
+otherIndicators<-merge(merge(merge(pdo.win, pdo.spr), pdo.sum), pdo.aut)
+
+# NPGO
+npgo<-read.csv("https://oceanview.pfeg.noaa.gov/erddap/tabledap/cciea_OC_NPGO.csv?time,NPGO", header = TRUE, stringsAsFactors = FALSE)
+npgo<-npgo[-1,]
+npgo$NPGO<-as.numeric(npgo$NPGO)
+npgo$year<-as.numeric(substr(npgo$time,1,4))
+npgo$month <- as.numeric(substr(npgo$time,6,7))
+npgo<-npgo[,c(3,4,2)]
+colnames(npgo)[3]<-"index"
+# Make the seasonal indices
+npgo.win<-npgo
+npgo.win<-npgo.win[npgo.win$month %in% 1:3,]
+npgo.win<-aggregate(npgo.win$index, by=list(npgo.win$year), mean, na.rm=TRUE)
+colnames(npgo.win)<-c("year","npgo.win")
+npgo.spr<-npgo[npgo$month %in% 4:6,]
+npgo.spr<-aggregate(npgo.spr$index, by=list(npgo.spr$year), mean, na.rm=TRUE)
+colnames(npgo.spr)<-c("year","npgo.spr")
+npgo.sum<-npgo[npgo$month %in% 7:9,]
+npgo.sum<-aggregate(npgo.sum$index, by=list(npgo.sum$year), mean, na.rm=TRUE)
+colnames(npgo.sum)<-c("year","npgo.sum")
+npgo.aut<-npgo[npgo$month %in% 10:12,]
+npgo.aut<-aggregate(npgo.aut$index, by=list(npgo.aut$year), mean, na.rm=TRUE)
+colnames(npgo.aut)<-c("year","npgo.aut")
+
+otherIndicators<-merge(merge(merge(merge(otherIndicators, npgo.win), npgo.spr), npgo.sum), npgo.aut)
+
+# ONI
+oni<-read.csv("https://oceanview.pfeg.noaa.gov/erddap/tabledap/cciea_OC_ONI.csv?time,ONI", header = TRUE, stringsAsFactors = FALSE)
+oni<-oni[-1,]
+oni$ONI<-as.numeric(oni$ONI)
+oni$year<-as.numeric(substr(oni$time,1,4))
+oni$month <- as.numeric(substr(oni$time,6,7))
+oni<-oni[,c(3,4,2)]
+colnames(oni)[3]<-"index"
+# Make the seasonal indices
+oni.win<-oni
+oni.win<-oni.win[oni.win$month %in% 1:3,]
+oni.win<-aggregate(oni.win$index, by=list(oni.win$year), mean, na.rm=TRUE)
+colnames(oni.win)<-c("year","oni.win")
+oni.spr<-oni[oni$month %in% 4:6,]
+oni.spr<-aggregate(oni.spr$index, by=list(oni.spr$year), mean, na.rm=TRUE)
+colnames(oni.spr)<-c("year","oni.spr")
+oni.sum<-oni[oni$month %in% 7:9,]
+oni.sum<-aggregate(oni.sum$index, by=list(oni.sum$year), mean, na.rm=TRUE)
+colnames(oni.sum)<-c("year","oni.sum")
+oni.aut<-oni[oni$month %in% 10:12,]
+oni.aut<-aggregate(oni.aut$index, by=list(oni.aut$year), mean, na.rm=TRUE)
+colnames(oni.aut)<-c("year","oni.aut")
+
+otherIndicators<-merge(merge(merge(merge(otherIndicators, oni.win), oni.spr), oni.sum), oni.aut)
+
+save(otherIndicators, file = 'CMISSTapp/data/otherIndicators.RData')
+

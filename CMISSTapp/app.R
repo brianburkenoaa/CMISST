@@ -69,13 +69,13 @@ ui <- fluidPage(
                                  value = TRUE),
 
                    hr(style = "border-top: 1px solid #000000;"),
-                   # Input: Slider for Years ----
+                   # Input: Slider for Ocean Years ----
                    sliderInput(inputId = "years",
                                label = "Years:",
                                min = 1970,
                                max = 2023,
                                sep="",
-                               value = c(1981, 2023)),
+                               value = c(1980, 2021)),
                    
                    # Input: lag response? ----
                    selectInput(inputId = "lag",
@@ -182,7 +182,7 @@ server <- function(input, output, session) {
 
     if (input$spatialData == "ERSST") oceanData <- oceanData_ERSST
     if (input$spatialData == "SSH") oceanData <- oceanData_SSH
-    
+
     cmisst <- get_CMISST_index(response = response.tmp[,c("year","val.scl")],
                                oceanData = oceanData,
                                min.lon = min.lon, max.lon = max.lon,

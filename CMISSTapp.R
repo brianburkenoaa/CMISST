@@ -26,30 +26,49 @@ load('CMISSTapp/data/responseData.RData')
 load('CMISSTapp/data/oceanSSTData.RData')
 # SSH
 load('CMISSTapp/data/oceanSSHData.RData')
+# PDO
+load('CMISSTapp/data/otherIndicators.RData')
 
 
 #************************************
 #       Define UI ----
 #************************************
 input.spatialData = "ERSST"
+#input.spatialData = "SSH"
+
 # Input: Choose a stock ----
 input.stock = "spCK"
+#input.stock = "faCK"
+#input.stock = "steel"
+
 # Input: Choose a file ----
 input.datafile=NULL
+
 # Input: log response? ----
 input.log = TRUE
+
 # Input: lag response? ----
 input.lag= 2
+
 # Input: Slider for the Latitude range ----
 input.lat = c(10, 62)
+
 # Input: Slider for the Latitude range ----
 input.long= c(158, 246)
-# Input: Slider for Years ----
-input.years= c(1970, 2023)
+
+# Input: Slider for Ocean Years ----
+input.years= c(1980, 2021)
+
 # Input: MAE LOO CV? ----
-input.loocv= FALSE
+#input.loocv= FALSE
+input.loocv= TRUE
+
 # Input: What map to plot
 input.season = "spr"
+
+# Not in the app, this is for loocv for the manuscript
+includePDO = FALSE
+#includePDO = TRUE
 
 #************************************
 # Define server logic ----
@@ -158,7 +177,7 @@ if (input.loocv) {
   text(paste("MAE =", round(mae[season,3], 2)),
      x = par("usr")[1]*0.75, y=par("usr")[4]*0.60, cex=1.6, col="blue")
 }
-
+# mae[mae$season=="spr",]
 
 # Output: Index time series
 index <- cmisst[[1]]

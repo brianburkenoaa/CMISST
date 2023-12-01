@@ -79,6 +79,31 @@ ggplot() + ggtitle(input.stock) +
   theme_classic()
 
 
+#************************************
+# Evaluate starting long
+#************************************
+
+startLongs<- seq(100, 220, 10)
+maeResults <- data.frame(stock=as.character(), long=as.numeric(), season=as.character(),
+                         MAE=as.numeric(), SE=as.numeric(), stringsAsFactors = FALSE)
+
+for (startLong in startLongs) {
+  input.long[1] <- startLong
+  cmisst <- updateCMISST()
+  mae<-cmisst[[7]]
+  maeResults <- rbind(maeResults, data.frame(stock= input.stock, long=rep(startLong,4), season=mae$season,
+                                             MAE=mae$mae.mean, SE=mae$mae.se, stringsAsFactors = FALSE))
+}
+input.long <- input.long.orig # reset
+
+ggplot() + ggtitle(input.stock) +
+  geom_ribbon(data=maeResults, aes(x=long, ymin=MAE-SE, ymax=MAE+SE, fill=season), alpha=0.1) +
+  geom_line(data=maeResults, aes(x=long, y=MAE, col=season)) +
+  ylab("Mean Absolute Error for the last 5 years") + xlab("Start Longitude") +
+  theme_classic()
+
+
+
 
 
 #************************************
@@ -103,11 +128,14 @@ for (startYear in startYears) {
   lmt<-max(abs(covMap), na.rm=TRUE)
   limits<-c(-lmt, lmt)
   # Optionally:
-  if (input.stock=="spCK") lmt<-0.9; limits<-c(-lmt, lmt)
-  if (input.stock=="steel") lmt<-1.0; limits<-c(-lmt, lmt)
+  # if (input.stock=="spCK") lmt<-0.9; limits<-c(-lmt, lmt)
+  # if (input.stock=="steel") lmt<-1.0; limits<-c(-lmt, lmt)
+  lmt<-1.0; limits<-c(-lmt, lmt)
   extent <- cmisst[[6]] # min, max of lat, long
   
-  gg <- ggplot() + ggtitle(paste(myTitle, startYear))
+  gg <- ggplot() +
+    #ggtitle(paste(myTitle, startYear))
+    ggtitle(startYear)
   # geom_raster is faster, but wants all cells to be the same size, which it seems tehy are not for the SSH data??
   if (input.spatialData == "SSH") gg <- gg + geom_tile(data = melt(covMap),
                                                        aes(x = Var1, y = Var2, fill=value), lwd=0, lty=0)
@@ -120,13 +148,15 @@ for (startYear in startYears) {
     #scale_fill_gradientn(colours = myPalette(100), name="Covariance", na.value = "white") +
     theme_classic() + theme(panel.border = element_rect(colour = "grey", fill=NA)) +
     theme(legend.position = "none") +
-    labs(x = "Longitude", y = "Latitude")
-  assign(paste('ggPlot', startYear, sep=''), gg)
+    #labs(x = "Longitude", y = "Latitude")
+    labs(x = "", y = "")
+    assign(paste('ggPlot', startYear, sep=''), gg)
 }
 input.years <- input.years.orig # reset
 
-margin = theme(plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"))
-grid.arrange(grobs = lapply(list(ggPlot1981, ggPlot1984, ggPlot1987, ggPlot1990,
-             ggPlot1993, ggPlot1996, ggPlot1999, ggPlot2002,
-             ggPlot2005, ggPlot2008, ggPlot2011), "+", margin), nrow = 3)
+margin = theme(plot.margin = unit(c(0,0,0,0), "cm"))
+grid.arrange(grobs = lapply(list(ggPlot1970, ggPlot1973, ggPlot1976, ggPlot1979,
+                                 ggPlot1982, ggPlot1985, ggPlot1988, ggPlot1991,
+                                 ggPlot1994, ggPlot1997, ggPlot2000, ggPlot2003,
+                                 ggPlot2006, ggPlot2009, ggPlot2012), "+", margin), nrow = 4)
 

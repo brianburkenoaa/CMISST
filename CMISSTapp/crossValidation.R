@@ -103,6 +103,13 @@ LOO_CV <- function(response = response,
     index.fit<-index_cov[index_cov$year %in% years.fit,]
     index.pred<-index_cov[index_cov$year %in% years.pred,]
 
+    # This is not used in the shiny app - it was for the manuscript
+    if (includePDO) {
+      index_other<-merge(otherIndicators, response, all.x=TRUE)
+      otherIndicators.fit<-index_other[index_other$year %in% years.fit,]
+      otherIndicators.pred<-index_other[index_other$year %in% years.pred,]
+    }
+
     # Need to loop over seasons
     for(season in c("win","spr","sum","aut")) {
       
@@ -116,7 +123,33 @@ LOO_CV <- function(response = response,
       mae<-rbind(mae, data.frame(model="cmisst", season=season, year=this_year,
                                      response=index.pred$val,
                                      mae=cov_mae, stringsAsFactors = FALSE))
-      
+      if (includePDO) {
+        # Optionally, include PDO
+        otherIndicators.fit$var <- otherIndicators.fit[,paste0("pdo.", season)]
+        otherIndicators.pred$var <- otherIndicators.pred[,paste0("pdo.", season)]
+        mdl<-lm(val~var, data=otherIndicators.fit)
+        pred<-predict(mdl, newdata = otherIndicators.pred)
+        cov_mae<-mean(abs(pred - otherIndicators.pred$val)) # This is MAE
+        mae<-rbind(mae, data.frame(model="pdo", season=season, year=this_year,
+                                   response=otherIndicators.pred$val,
+                                   mae=cov_mae, stringsAsFactors = FALSE))
+        otherIndicators.fit$var <- otherIndicators.fit[,paste0("npgo.", season)]
+        otherIndicators.pred$var <- otherIndicators.pred[,paste0("npgo.", season)]
+        mdl<-lm(val~var, data=otherIndicators.fit)
+        pred<-predict(mdl, newdata = otherIndicators.pred)
+        cov_mae<-mean(abs(pred - otherIndicators.pred$val)) # This is MAE
+        mae<-rbind(mae, data.frame(model="npgo", season=season, year=this_year,
+                                   response=otherIndicators.pred$val,
+                                   mae=cov_mae, stringsAsFactors = FALSE))
+        otherIndicators.fit$var <- otherIndicators.fit[,paste0("oni.", season)]
+        otherIndicators.pred$var <- otherIndicators.pred[,paste0("oni.", season)]
+        mdl<-lm(val~var, data=otherIndicators.fit)
+        pred<-predict(mdl, newdata = otherIndicators.pred)
+        cov_mae<-mean(abs(pred - otherIndicators.pred$val)) # This is MAE
+        mae<-rbind(mae, data.frame(model="oni", season=season, year=this_year,
+                                   response=otherIndicators.pred$val,
+                                   mae=cov_mae, stringsAsFactors = FALSE))
+      } # If include PDO
     } # End looping over season
   } # End looping over years
   
