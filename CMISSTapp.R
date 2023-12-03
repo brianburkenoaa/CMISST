@@ -60,8 +60,8 @@ input.long= c(158, 246)
 input.years= c(1980, 2021)
 
 # Input: MAE LOO CV? ----
-#input.loocv= FALSE
-input.loocv= TRUE
+input.loocv= FALSE
+#input.loocv= TRUE
 
 # Input: What map to plot
 input.season = "spr"
@@ -177,7 +177,7 @@ if (input.loocv) {
   text(paste("MAE =", round(mae[season,3], 2)),
      x = par("usr")[1]*0.75, y=par("usr")[4]*0.60, cex=1.6, col="blue")
 }
-# mae[mae$season=="spr",]
+# cmisst[[7]][cmisst[[7]]$season=="spr",]
 
 # Output: Index time series
 index <- cmisst[[1]]
@@ -197,4 +197,3 @@ out$year <- as.integer(out$year)
 out <- out[,c(5,6,1:4)]
 colnames(out)[2] <- "response"
 cbind(out)
-

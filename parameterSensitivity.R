@@ -160,3 +160,89 @@ grid.arrange(grobs = lapply(list(ggPlot1970, ggPlot1973, ggPlot1976, ggPlot1979,
                                  ggPlot1994, ggPlot1997, ggPlot2000, ggPlot2003,
                                  ggPlot2006, ggPlot2009, ggPlot2012), "+", margin), nrow = 4)
 
+
+
+#***************************************************
+#*   Plots for the manuscript
+#***************************************************
+library(gridExtra)
+library(grid)
+#library(gtable)
+library(RColorBrewer)
+
+plot.list<-list()
+lags<-0:4
+l_n<-length(lags)
+# mean absolute covariance of the map
+mac <- data.frame(season=as.character(), lag=as.numeric(), mac=as.numeric(), stringsAsFactors = FALSE)
+for (input.lag in lags) {
+  for (input.season in c("win","spr","sum","aut")) {
+    cmisst <- updateCMISST()
+    
+    # Covariance Map
+    myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")), space="Lab")
+    season <- switch(input.season,
+                     win = 2,
+                     spr = 3,
+                     sum = 4,
+                     aut = 5)
+    # myTitle <- switch(input.season,
+    #                   win = paste("Winter - lag", input.lag),
+    #                   spr = paste("Spring - lag", input.lag),
+    #                   sum = paste("Summer - lag", input.lag),
+    #                   aut = paste("Autumn - lag", input.lag))
+    covMap<-cmisst[[season]]
+    #cat(myTitle, round(mean(abs(covMap), na.rm = TRUE),2),"\n")
+    extent <- cmisst[[6]] # min, max of lat, long
+    
+    gg <- ggplot() #+ ggtitle(myTitle)
+    if (input.spatialData == "SSH") gg <- gg + geom_tile(data = melt(covMap),
+                                                         aes(x = Var1, y = Var2, fill=value), lwd=0, lty=0)
+    if (input.spatialData == "ERSST") gg <- gg + geom_raster(data = melt(covMap),
+                                                             aes(x = Var1, y = Var2, fill=value))
+    gg <- gg +
+      geom_sf(data=land, color="black", fill="grey", linewidth=0.25) +
+      xlim(extent[3], extent[4]) + ylim(extent[1], extent[2]) +
+      scale_fill_gradientn(colours = myPalette(100), limits=c(-0.75,0.75), name="Covariance", na.value = "white") +
+      #scale_fill_gradientn(colours = myPalette(100), name="Covariance", na.value = "white") +
+      theme_classic() +
+      theme(panel.border = element_rect(colour = "grey", fill=NA),
+            axis.text.x=element_blank(), axis.text.y=element_blank(),
+            axis.title.x = element_blank(), axis.title.y = element_blank(),
+            legend.position = "none",
+            plot.margin = unit(c(0.01, 0.01, 0.01, 0.01), "inches"))
+    plot.list[[length(plot.list)+1]] <- gg
+    mac[nrow(mac)+1,] <- data.frame(season=input.season, lag=input.lag, mac=mean(abs(covMap), na.rm = TRUE), stringsAsFactors = FALSE)
+  }
+}
+
+# grid.arrange(grobs=plot.list, nrow=l_n)
+# Complicated code to get row and column headers in grid.arrange
+cg <- arrangeGrob(
+  textGrob('Winter', gp = gpar(fontsize = 13, fontface = 'bold')),
+  textGrob('Spring', gp = gpar(fontsize = 13, fontface = 'bold')),
+  textGrob('Summer', gp = gpar(fontsize = 13, fontface = 'bold')),
+  textGrob('Autumn', gp = gpar(fontsize = 13, fontface = 'bold')), nrow=1)
+rg <- arrangeGrob(textGrob(paste("Lag",lags[1]), gp = gpar(fontsize = 13, fontface = 'bold'), rot=90))
+for (ll in 2:l_n) { # Add a row in the gtable, then add the Grob
+  rg <- gtable_add_rows(rg, unit(1, "null"), pos = -1) # -1 is the bottom
+  rg <- gtable_add_grob(rg, textGrob(paste("Lag",lags[ll]), gp = gpar(fontsize = 13, fontface = 'bold'), rot=90), t=ll, l=1)
+}
+# The headers take up the first row and column in hte layout
+pl<-c(list(cg), plot.list, list(rg))
+lay <- matrix(c(rep(1, 4), seq(2,(l_n*4+1))), ncol=4, byrow=TRUE)
+lay<-cbind(matrix(c(NA, rep(max(lay)+1, l_n))), lay)
+grid.arrange(grobs = pl, layout_matrix = lay,
+             widths=c(1,rep(8, 4)), heights=c(1,rep(4, l_n)))
+
+
+
+ggplot() +
+  geom_col(data = mac, aes(x = season, y = mac, fill=factor(lag)), position = "dodge") +
+  #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442")) +
+  scale_fill_brewer() +
+  theme_classic() +
+  theme(axis.text=element_text(size=14),
+        axis.title=element_text(size=16,face="bold")) +
+  xlab("") + ylab("Mean Absolute Covariance") +
+  guides(fill=guide_legend(title="Lag (years)"))
