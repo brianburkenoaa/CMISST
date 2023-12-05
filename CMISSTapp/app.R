@@ -1,14 +1,10 @@
 library(shiny)
 library(reshape2)
-#library(sf)
+library(sf)
 library(ggplot2)
 library(RColorBrewer)
 library(doBy)
 
-
-source('get_index.R')
-source('crossValidation.R')
-load("data/land.Rdata")
 
 # set parameters
 dataSet='ERSST'
@@ -17,13 +13,6 @@ removeBering=TRUE
 returnDataType='anom'
 returnObjectType='array'
 loocvYears=5 # the most recent X years to include in the LOO CV
-
-# Bonneville Dam Counts
-load('data/responseData.RData')
-# ERSST
-load('data/oceanSSTData.RData')
-# SSH
-load('data/oceanSSHData.RData')
 
 
 # Define UI ----

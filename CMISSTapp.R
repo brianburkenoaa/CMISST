@@ -2,15 +2,22 @@
 #  used to debug
 
 library(reshape2)
-#library(sf)
+library(sf)
 library(ggplot2)
 library(RColorBrewer)
 library(doBy)
 
+source('CMISSTapp/R/get_index.R')
+source('CMISSTapp/R/crossValidation.R')
 
-source('CMISSTapp/get_index.R')
-source('CMISSTapp/crossValidation.R')
+# The loadData.R script uses a relative path, which is inside the app folder
+#  I'm just going to load the data individually here
+#source('CMISSTapp/R/loadData.R')
 load("CMISSTapp/data/land.Rdata")
+load('CMISSTapp/data/responseData.RData')
+load('CMISSTapp/data/oceanSSTData.RData')
+load('CMISSTapp/data/oceanSSHData.RData')
+
 
 # set parameters
 dataSet='ERSST'
@@ -19,15 +26,6 @@ removeBering=TRUE
 returnDataType='anom'
 returnObjectType='array'
 loocvYears=5 # the most recent X years to include in the LOO CV
-
-# Bonneville Dam Counts
-load('CMISSTapp/data/responseData.RData')
-# ERSST
-load('CMISSTapp/data/oceanSSTData.RData')
-# SSH
-load('CMISSTapp/data/oceanSSHData.RData')
-# PDO
-load('CMISSTapp/data/otherIndicators.RData')
 
 
 #************************************
