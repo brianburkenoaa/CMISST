@@ -110,7 +110,7 @@ updateCMISST <- function() {
     return(append(cmisst, loocv))
   } else return(cmisst)
   # Returns index (6 columns, but one list item: 4 seasonal indices, year, val),
-  #         cov values (for maps, 4 seasons, each a list item), so the list is lenght 5 now
+  #         cov values (for maps, 4 seasons, each a list item), so the list is length 5 now
   #         lat, long min and max, 1 list item, that's 6 so far
   #         loocv, if requested, that's 7
 }

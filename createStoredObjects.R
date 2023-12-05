@@ -100,7 +100,7 @@ write.csv(x = response, file = 'CMISSTapp/data/user_response.csv', row.names = F
 
 
 #*******************************
-#*  PDO, NPGO, and ONI
+#*  PDO, NPGO, ONI, and SSTarc
 #*******************************
 
 pdo<-read.csv("https://oceanview.pfeg.noaa.gov/erddap/tabledap/cciea_OC_PDO.csv?time,PDO", header = TRUE, stringsAsFactors = FALSE)
@@ -177,6 +177,26 @@ oni.aut<-aggregate(oni.aut$index, by=list(oni.aut$year), mean, na.rm=TRUE)
 colnames(oni.aut)<-c("year","oni.aut")
 
 otherIndicators<-merge(merge(merge(merge(otherIndicators, oni.win), oni.spr), oni.sum), oni.aut)
+
+# SSTarc
+arc<-read.csv("../OceanTeamData/scripts/indicators/ersstArc/ersstArc.anom.csv", header = TRUE, stringsAsFactors = FALSE)
+colnames(arc)[3]<-"index"
+# Make the seasonal indices
+arc.win<-arc
+arc.win<-arc.win[arc.win$month %in% 1:3,]
+arc.win<-aggregate(arc.win$index, by=list(arc.win$year), mean, na.rm=TRUE)
+colnames(arc.win)<-c("year","arc.win")
+arc.spr<-arc[arc$month %in% 4:6,]
+arc.spr<-aggregate(arc.spr$index, by=list(arc.spr$year), mean, na.rm=TRUE)
+colnames(arc.spr)<-c("year","arc.spr")
+arc.sum<-arc[arc$month %in% 7:9,]
+arc.sum<-aggregate(arc.sum$index, by=list(arc.sum$year), mean, na.rm=TRUE)
+colnames(arc.sum)<-c("year","arc.sum")
+arc.aut<-arc[arc$month %in% 10:12,]
+arc.aut<-aggregate(arc.aut$index, by=list(arc.aut$year), mean, na.rm=TRUE)
+colnames(arc.aut)<-c("year","arc.aut")
+
+otherIndicators<-merge(merge(merge(merge(otherIndicators, arc.win), arc.spr), arc.sum), arc.aut)
 
 save(otherIndicators, file = 'CMISSTapp/data/otherIndicators.RData')
 

@@ -133,6 +133,7 @@ LOO_CV <- function(response = response,
         mae<-rbind(mae, data.frame(model="pdo", season=season, year=this_year,
                                    response=otherIndicators.pred$val,
                                    mae=cov_mae, stringsAsFactors = FALSE))
+        # NPGO
         otherIndicators.fit$var <- otherIndicators.fit[,paste0("npgo.", season)]
         otherIndicators.pred$var <- otherIndicators.pred[,paste0("npgo.", season)]
         mdl<-lm(val~var, data=otherIndicators.fit)
@@ -141,12 +142,22 @@ LOO_CV <- function(response = response,
         mae<-rbind(mae, data.frame(model="npgo", season=season, year=this_year,
                                    response=otherIndicators.pred$val,
                                    mae=cov_mae, stringsAsFactors = FALSE))
+        # ONI
         otherIndicators.fit$var <- otherIndicators.fit[,paste0("oni.", season)]
         otherIndicators.pred$var <- otherIndicators.pred[,paste0("oni.", season)]
         mdl<-lm(val~var, data=otherIndicators.fit)
         pred<-predict(mdl, newdata = otherIndicators.pred)
         cov_mae<-mean(abs(pred - otherIndicators.pred$val)) # This is MAE
         mae<-rbind(mae, data.frame(model="oni", season=season, year=this_year,
+                                   response=otherIndicators.pred$val,
+                                   mae=cov_mae, stringsAsFactors = FALSE))
+        # SSTarc
+        otherIndicators.fit$var <- otherIndicators.fit[,paste0("arc.", season)]
+        otherIndicators.pred$var <- otherIndicators.pred[,paste0("arc.", season)]
+        mdl<-lm(val~var, data=otherIndicators.fit)
+        pred<-predict(mdl, newdata = otherIndicators.pred)
+        cov_mae<-mean(abs(pred - otherIndicators.pred$val)) # This is MAE
+        mae<-rbind(mae, data.frame(model="SSTarc", season=season, year=this_year,
                                    response=otherIndicators.pred$val,
                                    mae=cov_mae, stringsAsFactors = FALSE))
       } # If include PDO
