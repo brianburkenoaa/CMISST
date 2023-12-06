@@ -56,6 +56,8 @@ input.long= c(158, 246)
 
 # Input: Slider for Ocean Years ----
 input.years= c(1980, 2021)
+input.pred_years=2021
+input.pred_years=NA
 
 # Input: MAE LOO CV? ----
 input.loocv= FALSE
@@ -78,13 +80,14 @@ updateCMISST <- function() {
   min.lat = input.lat[1]
   max.lat = input.lat[2]
   years = seq(input.years[1], input.years[2], 1)
-
+  years = sort(unique(c(years, input.pred_years)))
+  
   response.tmp <- response
   response.tmp$year <- response.tmp$year - as.numeric(input.lag)
   response.tmp <- response.tmp[response.tmp$year %in% years, c('year', input.stock)]
 
   # We changed the response years, so make sure years doesn't go beyond the new range
-  years <- years[years %in% response.tmp$year]
+  #years <- years[years %in% response.tmp$year]
 
   colnames(response.tmp) <- c('year','val')
   if(input.log) response.tmp$val <- log(response.tmp$val)
@@ -94,7 +97,7 @@ updateCMISST <- function() {
   if (input.spatialData == "SSH") oceanData <- oceanData_SSH
 
   cmisst <- get_CMISST_index(response = response.tmp[,c("year","val.scl")],
-                             oceanData = oceanData,
+                             oceanData = oceanData, pred_years = input.pred_years,
                              min.lon = min.lon, max.lon = max.lon,
                              min.lat = min.lat, max.lat = max.lat,
                              years = years, months = months,
@@ -181,7 +184,8 @@ if (input.loocv) {
 index <- cmisst[[1]]
 plot(index$year, index$win.cov, type='b', pch=20, col="red4",
      xlab="", ylab="CMISST Index",
-     ylim=c(min(index[,1:4], na.rm=TRUE), max(index[,1:4], na.rm=TRUE)))
+     ylim=c(min(index[,c("win.cov","spr.cov","sum.cov","aut.cov")], na.rm=TRUE),
+            max(index[,c("win.cov","spr.cov","sum.cov","aut.cov")], na.rm=TRUE)))
 points(index$year, index$spr.cov, type='b', pch=20, col="blue")
 points(index$year, index$sum.cov, type='b', pch=20, col="green3")
 points(index$year, index$aut.cov, type='b', pch=20, col="purple")
@@ -192,6 +196,6 @@ legend("topleft", legend = c("Win","Spr","Sum","Aut"), bty='n',
 # Output: Table
 out<-cmisst[[1]]
 out$year <- as.integer(out$year)
-out <- out[,c(5,6,1:4)]
-colnames(out)[2] <- "response"
+#out <- out[,c(5,6,1:4)]
+colnames(out)[colnames(out)=="val"] <- "response"
 cbind(out)

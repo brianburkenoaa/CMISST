@@ -4,7 +4,7 @@
 #source("create_OceanData_Object.R")
 
 get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
-                             years=NA, months=1:12,
+                             years=NA, months=1:12, years.pred=NA,
                              min.lon=158, max.lon=246,
                              min.lat=10, max.lat=62,
                              returnDataType='anom',
@@ -15,6 +15,10 @@ get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
   colnames(response)<-c("year","val")
   
   if (is.na(years)[1]) years=response$year
+  if (!is.na(years.pred)) {
+    years.fit<-years[!years %in% years.pred] # will be needed to calculate the covariance
+  } else years.fit <- years
+  # 'years' will be considered 'all years'  If we need fit or pred, we can access them
   year_mo<-data.frame(year=rep(years, each=length(months)), month=rep(months, length(years)),
                       label=paste(rep(years, each=length(months)), rep(months, length(years)), sep = "_"))
   
@@ -63,11 +67,11 @@ get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
   oceanData.s3.scl <- createSeasonalData(oceanData = oceanData, years = years, months = months, year_mo=year_mo, season = 3)
   oceanData.s4.scl <- createSeasonalData(oceanData = oceanData, years = years, months = months, year_mo=year_mo, season = 4)
 
-  # Get covariance between each cell's temperature and survival
-  covs1<-apply(oceanData.s1.scl, 1:2, function(x) cov(x, response$val, use="pairwise.complete.obs"))
-  covs2<-apply(oceanData.s2.scl, 1:2, function(x) cov(x, response$val, use="pairwise.complete.obs"))
-  covs3<-apply(oceanData.s3.scl, 1:2, function(x) cov(x, response$val, use="pairwise.complete.obs"))
-  covs4<-apply(oceanData.s4.scl, 1:2, function(x) cov(x, response$val, use="pairwise.complete.obs"))
+  # Get covariance between each cell's temperature and survival (only for fit years!!)
+  covs1<-apply(oceanData.s1.scl[,,as.character(years.fit)], 1:2, function(x) cov(x, response$val[response$year %in% years.fit], use="pairwise.complete.obs"))
+  covs2<-apply(oceanData.s2.scl[,,as.character(years.fit)], 1:2, function(x) cov(x, response$val[response$year %in% years.fit], use="pairwise.complete.obs"))
+  covs3<-apply(oceanData.s3.scl[,,as.character(years.fit)], 1:2, function(x) cov(x, response$val[response$year %in% years.fit], use="pairwise.complete.obs"))
+  covs4<-apply(oceanData.s4.scl[,,as.character(years.fit)], 1:2, function(x) cov(x, response$val[response$year %in% years.fit], use="pairwise.complete.obs"))
 
   #********************************************************************
   # Create the index (how similar is each year to the covariance map)
@@ -83,8 +87,9 @@ get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
                                   lm(as.vector(oceanData.s4.scl[,,tt]) ~ -1 + as.vector(covs4))$coef))
   coefs_cov<-data.frame(coefs_cov)
   coefs_cov$year<-years
-  index_cov<-cbind(coefs_cov,response$val)
-  colnames(index_cov)<-c("win.cov","spr.cov","sum.cov","aut.cov","year","val")
+  #index_cov<-cbind(coefs_cov,response$val)
+  index_cov<-merge(coefs_cov, response[response$year %in% years.fit,], all.x=TRUE)
+  colnames(index_cov)<-c("year","win.cov","spr.cov","sum.cov","aut.cov","val")
 
   return(list(index_cov, covs1, covs2, covs3, covs4, c(min.lat, max.lat, min.lon, max.lon)))
 }

@@ -163,7 +163,7 @@ server <- function(input, output, session) {
       response.tmp <- response.tmp[response.tmp$year %in% years, c('year', input$stock)]
     }
     # We changed the response years, so make sure years doesn't go beyond the new range
-    years <- years[years %in% response.tmp$year]
+    #years <- years[years %in% response.tmp$year]
 
     colnames(response.tmp) <- c('year','val')
     if(input$log) response.tmp$val <- log(response.tmp$val)
@@ -271,7 +271,8 @@ server <- function(input, output, session) {
     index <- cmisst[[1]]
     plot(index$year, index$win.cov, type='b', pch=20, col="red4",
          xlab="", ylab="CMISST Index",
-         ylim=c(min(index[,1:4], na.rm=TRUE), max(index[,1:4], na.rm=TRUE)))
+         ylim=c(min(index[,c("win.cov","spr.cov","sum.cov","aut.cov")], na.rm=TRUE),
+                max(index[,c("win.cov","spr.cov","sum.cov","aut.cov")], na.rm=TRUE)))
     points(index$year, index$spr.cov, type='b', pch=20, col="blue")
     points(index$year, index$sum.cov, type='b', pch=20, col="green3")
     points(index$year, index$aut.cov, type='b', pch=20, col="purple")
@@ -285,8 +286,7 @@ server <- function(input, output, session) {
     cmisst <- updateCMISST()
     out<-cmisst[[1]]
     out$year <- as.integer(out$year)
-    out <- out[,c(5,6,1:4)]
-    colnames(out)[2] <- "response"
+    colnames(out)[colnames(out)=="val"] <- "response"
     cbind(out)
   })
   
