@@ -62,9 +62,11 @@ ui <- fluidPage(
                    sliderInput(inputId = "years",
                                label = "Years:",
                                min = 1970,
-                               max = 2023,
+                               max = 2022,
                                sep="",
                                value = c(1980, 2021)),
+                   div(style = "margin-top: -20px"),
+                   helpText(a('Years refer to the SST or SSH data.  If your response variable is different, use the lag option below to align the data.')),
                    
                    # Input: lag response? ----
                    selectInput(inputId = "lag",
@@ -74,6 +76,16 @@ ui <- fluidPage(
                                            "2 years" = 2,
                                            "3 years" = 3),
                                selected = 2),
+
+                   # Input: Option for Prediction Years ----
+                   numericInput(inputId = "years.pred",
+                               label = "Prediction Years:",
+                               min = 1970,
+                               max = 2022,
+                               value = NA,
+                               width = '50%'),
+                   div(style = "margin-top: -20px"),
+                   helpText(a('Enter a single year to predict')),
                    
                    hr(style = "border-top: 1px solid #000000;"),
                    # Input: Slider for the Latitude range ----
@@ -150,6 +162,7 @@ server <- function(input, output, session) {
     min.lat = input$lat[1]
     max.lat = input$lat[2]
     years = seq(input$years[1], input$years[2], 1)
+    if (!is.na(input$years.pred)) years = sort(unique(c(years, input$years.pred)))
     
     # User input file, if provided
     inFile <- input$datafile
@@ -173,7 +186,7 @@ server <- function(input, output, session) {
     if (input$spatialData == "SSH") oceanData <- oceanData_SSH
 
     cmisst <- get_CMISST_index(response = response.tmp[,c("year","val.scl")],
-                               oceanData = oceanData,
+                               oceanData = oceanData, years.pred = input$years.pred,
                                min.lon = min.lon, max.lon = max.lon,
                                min.lat = min.lat, max.lat = max.lat,
                                years = years, months = months,

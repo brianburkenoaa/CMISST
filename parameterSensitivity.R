@@ -129,19 +129,21 @@ response_long <- melt(response, id.vars = "year", variable.name = "stock")
 response_long$stock <- factor(response_long$stock, levels = c("spCK","faCK","steel"))
 
 g1 <- ggplot(data = response_long[response_long$year>=input.years[1],]) +
-  geom_line(aes(x = year, y = value/1000, col=stock), size=1.1) +
+  geom_line(aes(x = year, y = value/1000, col=stock), linewidth=1.1) +
   theme_classic() +
   theme(axis.title.x = element_blank(),
         legend.position = c(0.2, 0.8)) + ylab("Adult Returns (x1000)") +
   scale_color_discrete(name = "", labels = c("Spring Chinook","Fall Chinook","Steelhead"))
 
 # Make the correlation plots
+cols <- c("#F8766D", "#00BA38", "#619CFF") # ggplot's defaults
+colIndex<-1
 for (input.stock in c("spCK","faCK","steel")) {
   response<-response.orig[,c("year",input.stock)]
   cmisst <- updateCMISST()
   index<-cmisst[[1]]
   gg <- ggplot(data = index) +
-    geom_point(aes(x = spr.cov, y = val), size=1.5, col="blue2") +
+    geom_point(aes(x = spr.cov, y = val), size=1.5, col=cols[colIndex]) +
     theme_classic() +
     theme(plot.margin = margin(0.5, 0.01, 0.01, 0.01)) +
     xlab(paste(switch(input.stock, spCK="Spring Ch.", faCK="Fall Ch.", steel="Steelhead"), "CMISST")) +
@@ -149,6 +151,7 @@ for (input.stock in c("spCK","faCK","steel")) {
   if (input.stock == "faCK" | input.stock == "steel") gg <- gg +
     theme(axis.title.y = element_text(color = "white"))
   assign(paste("gg_",input.stock,"_cor", sep = ""), gg)
+  colIndex=colIndex+1
 }  
 
 ggFig2 <- g1 + gg_spCK_cor + gg_faCK_cor + gg_steel_cor + 

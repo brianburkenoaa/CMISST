@@ -56,8 +56,8 @@ input.long= c(158, 246)
 
 # Input: Slider for Ocean Years ----
 input.years= c(1980, 2021)
-input.pred_years=2021
-input.pred_years=NA
+input.years.pred=c(2021,2022)
+input.years.pred=NA
 
 # Input: MAE LOO CV? ----
 input.loocv= FALSE
@@ -80,7 +80,7 @@ updateCMISST <- function() {
   min.lat = input.lat[1]
   max.lat = input.lat[2]
   years = seq(input.years[1], input.years[2], 1)
-  years = sort(unique(c(years, input.pred_years)))
+  years = sort(unique(c(years, input.years.pred)))
   
   response.tmp <- response
   response.tmp$year <- response.tmp$year - as.numeric(input.lag)
@@ -97,7 +97,7 @@ updateCMISST <- function() {
   if (input.spatialData == "SSH") oceanData <- oceanData_SSH
 
   cmisst <- get_CMISST_index(response = response.tmp[,c("year","val.scl")],
-                             oceanData = oceanData, pred_years = input.pred_years,
+                             oceanData = oceanData, years.pred = input.years.pred,
                              min.lon = min.lon, max.lon = max.lon,
                              min.lat = min.lat, max.lat = max.lat,
                              years = years, months = months,

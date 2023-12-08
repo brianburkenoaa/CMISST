@@ -15,7 +15,7 @@ get_CMISST_index <- function(response, oceanData=oceanData_ERSST,
   colnames(response)<-c("year","val")
   
   if (is.na(years)[1]) years=response$year
-  if (!is.na(years.pred)) {
+  if (!is.na(years.pred[1])) {
     years.fit<-years[!years %in% years.pred] # will be needed to calculate the covariance
   } else years.fit <- years
   # 'years' will be considered 'all years'  If we need fit or pred, we can access them
